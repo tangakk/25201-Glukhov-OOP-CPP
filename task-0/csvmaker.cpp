@@ -1,7 +1,7 @@
 #include "csvmaker.h"
 #include <algorithm>
 #include <fstream>
-#include <sstream>
+#include <regex>
 #include <vector>
 
 using namespace std;
@@ -10,21 +10,30 @@ CSVMaker::CSVMaker() { data = new map<string, pair<int, double>>; }
 
 CSVMaker::~CSVMaker() { delete data; }
 
-void CSVMaker::ReadFile(const string &filename) {
+void CSVMaker::readFile(const string &filename) {
   ifstream file(filename);
   string line;
   long totalWords = 0;
   while (getline(file, line)) {
-    istringstream iss(line);
+    regex delimiter(
+        "[^A-Za-z0-9]"); // все символы кроме цифр и букв - разделители
+    sregex_token_iterator it(line.begin(), line.end(), delimiter, -1);
+    sregex_token_iterator end;
     string word;
-    while (iss >> word) {
-      auto it = data->find(word);
-      if (it != data->end()) {
-        it->second.first++;
+    while (it != end) {
+      word = *it;
+      if (word.empty()) {
+        ++it;
+        continue;
+      }
+      auto itt = data->find(word);
+      if (itt != data->end()) {
+        itt->second.first++;
       } else {
         (*data)[word] = make_pair(1, 0.0);
       }
       totalWords++;
+      ++it;
     }
   }
   file.close();
@@ -33,7 +42,7 @@ void CSVMaker::ReadFile(const string &filename) {
   }
 }
 
-void CSVMaker::PrintSorted(ostream &out) {
+void CSVMaker::printSorted(ostream &out) {
   vector<pair<string, pair<int, double>>> sortedData(data->begin(),
                                                      data->end());
   sort(sortedData.begin(), sortedData.end(), [](const auto &a, const auto &b) {

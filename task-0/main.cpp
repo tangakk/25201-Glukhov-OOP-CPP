@@ -12,13 +12,13 @@ int main(int argc, char* argv[]) {
     string inputFile = argv[1];
     string outputFile = argv[2];
     CSVMaker* csvMaker = new CSVMaker();
-    csvMaker->ReadFile(inputFile);
+    csvMaker->readFile(inputFile);
     ofstream outFile(outputFile);
     if (!outFile) {
         cerr << "Error opening output file: " << outputFile << endl;
         return 1;
     }
-    csvMaker->PrintSorted(outFile);
+    csvMaker->printSorted(outFile);
     outFile.close();
     delete csvMaker;
     return 0;

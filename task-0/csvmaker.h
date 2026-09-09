@@ -10,6 +10,6 @@ class CSVMaker {
 public:
   CSVMaker();
   ~CSVMaker();
-  void ReadFile(const string &filename);
-  void PrintSorted(ostream &out);
+  void readFile(const string &filename);
+  void printSorted(ostream &out);
 };
