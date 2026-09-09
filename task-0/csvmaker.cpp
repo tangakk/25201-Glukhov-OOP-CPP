@@ -38,11 +38,11 @@ void CSVMaker::readFile(const string &filename) {
   }
   file.close();
   for (auto &entry : *data) {
-    entry.second.second = (double(entry.second.first) / totalWords) * 100.0;
+    entry.second.second = (static_cast<double>(entry.second.first) / totalWords) * 100.0;
   }
 }
 
-void CSVMaker::printSorted(ostream &out) {
+void CSVMaker::printSorted(ostream &out) const {
   vector<pair<string, pair<int, double>>> sortedData(data->begin(),
                                                      data->end());
   sort(sortedData.begin(), sortedData.end(), [](const auto &a, const auto &b) {

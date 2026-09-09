@@ -1,4 +1,4 @@
-#include <list>
+#pragma once
 #include <map>
 #include <string>
 #include <utility>
@@ -11,5 +11,5 @@ public:
   CSVMaker();
   ~CSVMaker();
   void readFile(const string &filename);
-  void printSorted(ostream &out);
+  void printSorted(ostream &out) const;
 };
