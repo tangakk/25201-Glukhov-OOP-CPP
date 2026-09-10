@@ -10,9 +10,10 @@ using std::ifstream;
 class FileReader {
 private:
     string filename;
-    ifstream* f;
+    ifstream *f;
+
 public:
-    FileReader(string filename);
+    FileReader(const string &filename);
 
     // open file
     void open();
@@ -25,7 +26,6 @@ public:
 
     // close file
     void close();
-
 };
 
 #endif //CPP_FILEREADER_H

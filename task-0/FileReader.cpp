@@ -3,7 +3,7 @@
 using std::runtime_error;
 using std::getline;
 
-FileReader::FileReader(string filename) {
+FileReader::FileReader(const string &filename) {
     this->filename = filename;
     this->f = new ifstream;
 }
@@ -25,7 +25,7 @@ string FileReader::next() {
 }
 
 bool FileReader::hasNext() {
-    return !this->f->eof();
+    return this->f->peek() != EOF;
 }
 
 void FileReader::close() {
