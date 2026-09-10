@@ -20,7 +20,6 @@ public:
     //open file
     void open();
 
-    //write data to file (making sure that every string will contain the same amount of data? nah)
     template<typename First, typename... Rest>
     void write(First first, Rest... rest);
 
