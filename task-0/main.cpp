@@ -4,9 +4,11 @@
 #include "StatisticsStorage.h"
 #include "CSVFileWriter.h"
 
+using std::cerr;
+
 int main(const int argc, char *argv[]) {
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <input_file> <output_file>" << std::endl;
+        cerr << "Usage: " << argv[0] << " <input_file> <output_file>\n";
         return 1;
     }
     FileReader reader(argv[1]);
