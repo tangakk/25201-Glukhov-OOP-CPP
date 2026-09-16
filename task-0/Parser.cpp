@@ -5,8 +5,12 @@
 using std::regex;
 using std::sregex_token_iterator;
 
+Parser::Parser(const string &regex) {
+    this->regex_str = regex;
+}
+
 list<string> Parser::parse(const string &str) {
-    regex delimiter("[^A-Za-z0-9]"); // everything but numbers and letters is a delimiter
+    regex delimiter(this->regex_str); // everything but numbers and letters is a delimiter
     sregex_token_iterator it(str.begin(), str.end(), delimiter, -1);
     sregex_token_iterator end;
     list<string> words;
