@@ -9,7 +9,7 @@ Parser::Parser(const string &regex) {
     this->regex_str = regex;
 }
 
-list<string> Parser::parse(const string &str) {
+list<string> Parser::parse(const string &str) const {
     regex delimiter(this->regex_str);
     sregex_token_iterator it(str.begin(), str.end(), delimiter, -1);
     sregex_token_iterator end;

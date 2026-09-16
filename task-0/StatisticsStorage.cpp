@@ -20,7 +20,7 @@ void StatisticsStorage::calculatePercentages() {
     }
 }
 
-list<pair<string, pair<int, float> > > StatisticsStorage::getSortedStatistics() {
+list<pair<string, pair<int, float> > > StatisticsStorage::getSortedStatistics() const {
     list<pair<string, pair<int, float> > > sortedList(this->storage.begin(), this->storage.end());
     sortedList.sort([](const pair<string, pair<int, float> > &a, const pair<string, pair<int, float> > &b) {
         return a.second.first > b.second.first; // sort by count in descending order

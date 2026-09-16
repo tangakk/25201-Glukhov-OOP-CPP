@@ -25,7 +25,7 @@ public:
     void calculatePercentages();
 
     // get sorted list of words with their counts and percentages
-    list<pair<string, pair<int, float> > > getSortedStatistics();
+    list<pair<string, pair<int, float> > > getSortedStatistics() const;
 };
 
 

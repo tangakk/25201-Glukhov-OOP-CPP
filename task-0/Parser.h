@@ -13,7 +13,7 @@ private:
     public:
         Parser(const string &regex);
         // parse string and return result
-        list<string> parse(const string &str);
+        list<string> parse(const string &str) const;
 };
 
 
