@@ -10,7 +10,7 @@ Parser::Parser(const string &regex) {
 }
 
 list<string> Parser::parse(const string &str) {
-    regex delimiter(this->regex_str); // everything but numbers and letters is a delimiter
+    regex delimiter(this->regex_str);
     sregex_token_iterator it(str.begin(), str.end(), delimiter, -1);
     sregex_token_iterator end;
     list<string> words;

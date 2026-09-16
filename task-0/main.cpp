@@ -13,7 +13,7 @@ int main(const int argc, char *argv[]) {
     }
     FileReader reader(argv[1]);
     reader.open();
-    Parser parser("[^A-Za-z0-9]");
+    Parser parser("[^A-Za-z0-9]");  // everything but numbers and letters is a delimiter
     StatisticsStorage storage;
     while (reader.hasNext()) {
         string str = reader.next();
