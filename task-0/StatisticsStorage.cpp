@@ -1,5 +1,10 @@
 #include "StatisticsStorage.h"
 
+StatisticsStorage::StatisticsStorage() {
+    this->totalWordsCount = 0;
+    this->storage.clear();
+}
+
 void StatisticsStorage::addWord(const string &word) {
     this->totalWordsCount++;
     if (this->storage.find(word) == this->storage.end()) {

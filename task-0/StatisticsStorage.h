@@ -16,6 +16,8 @@ private:
     long long totalWordsCount = 0;
 
 public:
+    StatisticsStorage();
+
     // add word to storage
     void addWord(const string &word);
 
