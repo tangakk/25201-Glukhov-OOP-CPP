@@ -6,7 +6,6 @@ TEST(StatisticsStorageTests, test1) {
     storage.addWord("hello");
     storage.addWord("world");
     storage.addWord("hello");
-    storage.calculatePercentages();
     list<pair<string, pair<int, float> > > expected = {
             {"hello", {2, 66.6667f}},
             {"world", {1, 33.3333f}}
@@ -35,7 +34,6 @@ TEST(StatisticsStorageTests, test2) {
     for (int i = 0; i < 200; ++i) {
         storage.addWord("a");
     }
-    storage.calculatePercentages();
     list<pair<string, pair<int, float> > > expected = {
             {"b", {500, 62.5f}},
             {"a", {300, 37.5f}}

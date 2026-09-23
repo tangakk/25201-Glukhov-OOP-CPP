@@ -24,7 +24,6 @@ int main(const int argc, char *argv[]) {
     }
     reader.close();
 
-    storage.calculatePercentages();
     list<pair<string, pair<int, float> > > sortedStatistics = storage.getSortedStatistics();
 
     CSVFileWriter writer(argv[2]);

@@ -15,17 +15,17 @@ private:
     map<string, pair<int, float> > storage; // word -> (count, count in %)
     long long totalWordsCount = 0;
 
+    // calculate percentages for all words
+    void calculatePercentages();
+
+
 public:
     StatisticsStorage();
 
     // add word to storage
     void addWord(const string &word);
-
-    // calculate percentages for all words
-    void calculatePercentages();
-
     // get sorted list of words with their counts and percentages
-    list<pair<string, pair<int, float> > > getSortedStatistics() const;
+    list<pair<string, pair<int, float> > > getSortedStatistics();
 };
 
 
