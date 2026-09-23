@@ -32,4 +32,5 @@ int main(const int argc, char *argv[]) {
         writer.write(entry.first, entry.second.first, entry.second.second);
     }
     writer.close();
+    return 0;
 }
