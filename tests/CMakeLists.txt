@@ -23,3 +23,16 @@ target_link_libraries(
         task-0_tests_run
         gtest
         gtest_main)
+
+add_executable(
+        task-1_tests_run
+        task-1/BitArrayTests.cpp
+        ../task-1/BitArray.cpp
+        ../task-1/BitArray.h
+)
+
+target_link_libraries(
+        task-1_tests_run
+        gtest
+        gtest_main
+)
