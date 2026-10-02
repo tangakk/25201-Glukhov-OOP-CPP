@@ -54,13 +54,13 @@ TEST(BitArrayTests, test5) {
     BitArray b(5, 0b11000);
     ASSERT_EQ(a.to_string(), "10101");
     a &= b;
-    ASSERT_EQ(a.to_string(), "00001");
+    ASSERT_EQ(a.to_string(), "10000");
     a |= b;
-    ASSERT_EQ(a.to_string(), "00011");
+    ASSERT_EQ(a.to_string(), "11000");
     a ^= b;
     ASSERT_EQ(a.to_string(), "00000");
     b = ~b;
-    ASSERT_EQ(b.to_string(), "11100");
+    ASSERT_EQ(b.to_string(), "00111");
 }
 
 TEST(BitArrayTests, test6) {
@@ -70,6 +70,7 @@ TEST(BitArrayTests, test6) {
     a >>= 2;
     ASSERT_EQ(a.to_string(), "00101");
     BitArray b(16, 0b0001'1010'0110'1111);
+    ASSERT_EQ(b.to_string(), "0001101001101111");
     a = b << 10;
     ASSERT_EQ(a.to_string(), "1011110000000000");
     a = b >> 10;
@@ -79,9 +80,9 @@ TEST(BitArrayTests, test6) {
 TEST(BitArrayTests, test7) {
     BitArray a(5, 0b11111);
     ASSERT_EQ(a.any(), true);
-    ASSERT_EQ(a.all(), false);
+    ASSERT_EQ(a.all(), true);
     ASSERT_EQ(a.none(), false);
-    ASSERT_EQ(a.count(), 3);
+    ASSERT_EQ(a.count(), 5);
     a.reset();
     ASSERT_EQ(a.any(), false);
     ASSERT_EQ(a.all(), false);
@@ -100,37 +101,38 @@ TEST(BitArrayTests, test9) {
     BitArray a(5, 0b10101);
     a.push_back(true);
     ASSERT_EQ(a.size(), 6);
-    ASSERT_EQ(a[5], true);
+    ASSERT_EQ(a.to_string(), "110101");
     a.push_back(false);
     ASSERT_EQ(a.size(), 7);
+    ASSERT_EQ(a.to_string(), "0110101");
     ASSERT_EQ(a[6], false);
     a.clear();
     ASSERT_EQ(a.size(), 0);
 }
 
 TEST(BitArrayTests, test10) {
-    BitArray a(5, 0b10000);
-    BitArray b(10, 0b0011000000);
+    BitArray a(5, 0b10001);
+    BitArray b(10, 0b01100);
     a |= b;
     ASSERT_EQ(a.size(), 5);
-    ASSERT_EQ(a.to_string(), "10110");
-    ASSERT_ANY_THROW(a&=b);
+    ASSERT_EQ(a.to_string(), "11101");
+    ASSERT_ANY_THROW(b&=a);
 }
 
 TEST(BitArrayTests, resizeTest) {
     BitArray a(5, 0b00000);
     a.resize(10, true);
     ASSERT_EQ(a.size(), 10);
-    ASSERT_EQ(a.to_string(), "0000011111");
+    ASSERT_EQ(a.to_string(), "1111100000");
     ASSERT_ANY_THROW(a.resize(5));
     a.clear();
-    a.resize(10, false);
+    a.resize(3, false);
     ASSERT_EQ(a.size(), 3);
-    ASSERT_EQ(a.to_string(), "111");
+    ASSERT_EQ(a.to_string(), "000");
 }
 
 TEST(BitArrayTests, operatorTest) {
     BitArray a(5, 0b11111);
     a[3] = 0;
-    ASSERT_EQ(a.to_string(), "11101");
+    ASSERT_EQ(a.to_string(), "10111");
 }

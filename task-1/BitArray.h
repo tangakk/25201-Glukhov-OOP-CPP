@@ -8,6 +8,7 @@
 
 using std::string;
 
+//BitArray is little-endian
 class BitArray {
 private:
     unsigned long *data;
@@ -26,6 +27,7 @@ private:
         operator bool() const;
     };
 
+    void clear_junk();
 public:
     BitArray();
 

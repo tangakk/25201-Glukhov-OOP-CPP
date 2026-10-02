@@ -52,8 +52,8 @@ BitArray &BitArray::operator=(const BitArray &b) {
 }
 
 void BitArray::resize(int num_bits, bool value) {
-    if (num_bits >= this->capacity * sizeof(unsigned long) * 8) {
-        int new_capacity = num_bits / sizeof(unsigned long) * 8 + (num_bits % (sizeof(unsigned long) * 8) != 0);
+    if (num_bits >= this->num_bits) {
+        int new_capacity = num_bits / (sizeof(unsigned long) * 8) + (num_bits % (sizeof(unsigned long) * 8) != 0);
         unsigned long *new_data = new unsigned long[new_capacity];
         copy(this->data, this->data + this->capacity, new_data);
         delete this->data;
@@ -64,6 +64,7 @@ void BitArray::resize(int num_bits, bool value) {
         for (int i = this->capacity; i < new_capacity; i++) {
             this->data[i] = value ? -1 : 0;
         }
+        this->num_bits = num_bits;
         return;
     }
 
@@ -133,12 +134,12 @@ BitArray &BitArray::operator<<=(int n) {
         }
         *this <<= n % (sizeof(unsigned long) * 8);
     }
+    this->clear_junk();
     return *this;
 }
 
 BitArray &BitArray::operator>>=(int n) {
     if (n <= 0) return *this;
-    //oh i hate this
     if (n <= sizeof(unsigned long) * 8) {
         this->data[this->capacity - 1] >>= n;
         for (int i = this->capacity - 2; i >= 0; i--) {
@@ -156,6 +157,7 @@ BitArray &BitArray::operator>>=(int n) {
         }
         *this >>= n % (sizeof(unsigned long) * 8);
     }
+    this->clear_junk();
     return *this;
 }
 
@@ -172,11 +174,11 @@ BitArray BitArray::operator>>(int n) const {
 }
 
 BitArray &BitArray::set(int n, bool value) {
-    int index = n / sizeof(unsigned long) * 8;
+    int index = n / (sizeof(unsigned long) * 8);
     if (value) {
-        this->data[index] |= (1U << n);
+        this->data[index] |= (1UL << (n % (sizeof(unsigned long) * 8)));
     } else {
-        this->data[index] &= ~(1U << n);
+        this->data[index] &= ~(1UL << (n % (sizeof(unsigned long) * 8)));
     }
     return *this;
 }
@@ -293,7 +295,7 @@ bool BitArray::empty() const {
 string BitArray::to_string() const {
     string res = "";
     //i guess there's no better way to do that in c++17...
-    for (int i = 0; i < this->num_bits; i++) {
+    for (int i = this->num_bits - 1; i >= 0; i--) {
         res += (*this)[i] ? "1" : "0";
     }
     return res;
@@ -336,4 +338,10 @@ BitArray operator^(const BitArray &b1, const BitArray &b2) {
     BitArray res(b1);
     res ^= b2;
     return res;
+}
+
+void BitArray::clear_junk() {
+    for (int i = (this->capacity) * sizeof(unsigned long) * 8 - 1; i >= num_bits; i--) {
+        this->set(i, false);
+    }
 }
