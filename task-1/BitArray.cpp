@@ -66,9 +66,9 @@ void BitArray::resize(int num_bits, bool value) {
         }
         this->num_bits = num_bits;
         this->capacity = new_capacity;
+        this->clear_junk();
         return;
     }
-
     throw logic_error("BitArray size cannot be reduced without clearing it first");
 }
 

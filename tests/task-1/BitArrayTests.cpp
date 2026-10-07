@@ -10,7 +10,6 @@ TEST(BitArrayTests, test0) {
 
 TEST(BitArrayTests, test1) {
     BitArray a(10, 0b1010101010);
-    cout << a.to_string() << endl;
     for (int i = 0; i < 10; ++i) {
         ASSERT_EQ(a[i], (i % 2 != 0));
     }
