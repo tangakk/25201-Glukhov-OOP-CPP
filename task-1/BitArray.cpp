@@ -58,13 +58,14 @@ void BitArray::resize(int num_bits, bool value) {
         copy(this->data, this->data + this->capacity, new_data);
         delete this->data;
         this->data = new_data;
-        for (int i = this->num_bits; i % (sizeof(unsigned long) * 8) != 0; i++) {
+        for (int i = this->num_bits; i % (sizeof(unsigned long) * 8) != 0 && i < num_bits; i++) {
             this->set(i, value);
         }
         for (int i = this->capacity; i < new_capacity; i++) {
             this->data[i] = value ? -1 : 0;
         }
         this->num_bits = num_bits;
+        this->capacity = new_capacity;
         return;
     }
 
@@ -117,19 +118,19 @@ BitArray &BitArray::operator^=(const BitArray &b) {
 BitArray &BitArray::operator<<=(int n) {
     if (n <= 0) return *this;
     //oh i hate this
-    if (n <= sizeof(unsigned long) * 8) {
-        this->data[0] <<= n;
-        for (int i = 1; i < this->capacity; i++) {
+    if (n < sizeof(unsigned long) * 8) {
+        this->data[this->capacity - 1] <<= n;
+        for (int i = this->capacity - 2; i >= 0; i--) {
             unsigned long tmp = this->data[i] >> (sizeof(unsigned long) * 8 - n);
             this->data[i] <<= n;
-            this->data[i - 1] |= tmp;
+            this->data[i + 1] |= tmp;
         }
     } else {
-        int to_ashes = n / sizeof(unsigned long) * 8;
-        for (int i = 0; i < this->capacity - to_ashes; i++) {
-            this->data[i] = this->data[i + to_ashes];
+        int to_ashes = n / (sizeof(unsigned long) * 8);
+        for (int i = this->capacity - to_ashes; i >= to_ashes; i--) {
+            this->data[i] = this->data[i - to_ashes];
         }
-        for (int i = this->capacity - to_ashes; i < this->capacity; i++) {
+        for (int i = 0; i < to_ashes; i++) {
             this->data[i] = 0;
         }
         *this <<= n % (sizeof(unsigned long) * 8);
@@ -140,19 +141,20 @@ BitArray &BitArray::operator<<=(int n) {
 
 BitArray &BitArray::operator>>=(int n) {
     if (n <= 0) return *this;
+    //i hate this too btw
     if (n <= sizeof(unsigned long) * 8) {
-        this->data[this->capacity - 1] >>= n;
-        for (int i = this->capacity - 2; i >= 0; i--) {
+        this->data[0] >>= n;
+        for (int i = 1; i < this->capacity; i++) {
             unsigned long tmp = this->data[i] << (sizeof(unsigned long) * 8 - n);
             this->data[i] >>= n;
-            this->data[i + 1] |= tmp;
+            this->data[i - 1] |= tmp;
         }
     } else {
-        int to_ashes = n / sizeof(unsigned long) * 8;
-        for (int i = this->capacity - to_ashes; i >= to_ashes; i--) {
-            this->data[i] = this->data[i - to_ashes];
+        int to_ashes = n / (sizeof(unsigned long) * 8);
+        for (int i = 0; i < this->capacity - to_ashes; i++) {
+            this->data[i] = this->data[i + to_ashes];
         }
-        for (int i = 0; i < to_ashes; i++) {
+        for (int i = this->capacity - to_ashes; i < this->capacity; i++) {
             this->data[i] = 0;
         }
         *this >>= n % (sizeof(unsigned long) * 8);

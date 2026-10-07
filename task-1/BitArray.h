@@ -8,7 +8,6 @@
 
 using std::string;
 
-//BitArray is little-endian
 class BitArray {
 private:
     unsigned long *data;
@@ -114,7 +113,7 @@ public:
     //Returns true if BitArray is empty.
     bool empty() const;
 
-    //Returns string representation of BitArray.
+    //Returns big-endian string representation of BitArray.
     string to_string() const;
 
     friend bool operator==(const BitArray &a, const BitArray &b);
