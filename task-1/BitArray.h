@@ -5,8 +5,10 @@
 #ifndef CPP_BITARRAY_H
 #define CPP_BITARRAY_H
 #include <string>
+#include <ostream>
 
 using std::string;
+using std::ostream;
 
 class BitArray {
 private:
@@ -76,6 +78,8 @@ public:
     BitArray operator>>(int n) const;
 
 
+
+
     //Sets bit with index n to val.
     BitArray &set(int n, bool val = true);
 
@@ -119,6 +123,8 @@ public:
     string to_string() const;
 
     friend bool operator==(const BitArray &a, const BitArray &b);
+
+    friend ostream &operator<<(ostream &os, const BitArray &a);
 };
 
 bool operator==(const BitArray &a, const BitArray &b);

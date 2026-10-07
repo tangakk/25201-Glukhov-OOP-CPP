@@ -347,3 +347,8 @@ void BitArray::clear_junk() {
         this->set(i, false);
     }
 }
+
+ostream &operator<<(ostream &os, const BitArray &b) {
+    os<<b.to_string();
+    return os;
+}
