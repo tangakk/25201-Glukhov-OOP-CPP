@@ -23,7 +23,7 @@ BitArray::~BitArray() {
 BitArray::BitArray(int num_bits, unsigned long value) {
     if (num_bits < 0) num_bits = 0; //no you don't
     this->num_bits = num_bits;
-    this->capacity = num_bits / sizeof(unsigned long) * 8 + (num_bits % (sizeof(unsigned long) * 8) != 0);
+    this->capacity = num_bits / WORD_SIZE + (num_bits % WORD_SIZE != 0);
     this->data = new unsigned long[this->capacity];
     if (num_bits)
         this->data[0] = value;
@@ -53,12 +53,12 @@ BitArray &BitArray::operator=(const BitArray &b) {
 
 void BitArray::resize(int num_bits, bool value) {
     if (num_bits >= this->num_bits) {
-        int new_capacity = num_bits / (sizeof(unsigned long) * 8) + (num_bits % (sizeof(unsigned long) * 8) != 0);
+        int new_capacity = num_bits / WORD_SIZE + (num_bits % WORD_SIZE != 0);
         unsigned long *new_data = new unsigned long[new_capacity];
         copy(this->data, this->data + this->capacity, new_data);
         delete this->data;
         this->data = new_data;
-        for (int i = this->num_bits; i % (sizeof(unsigned long) * 8) != 0 && i < num_bits; i++) {
+        for (int i = this->num_bits; i % WORD_SIZE != 0 && i < num_bits; i++) {
             this->set(i, value);
         }
         for (int i = this->capacity; i < new_capacity; i++) {
@@ -118,22 +118,22 @@ BitArray &BitArray::operator^=(const BitArray &b) {
 BitArray &BitArray::operator<<=(int n) {
     if (n <= 0) return *this;
     //oh i hate this
-    if (n < sizeof(unsigned long) * 8) {
+    if (n < WORD_SIZE) {
         this->data[this->capacity - 1] <<= n;
         for (int i = this->capacity - 2; i >= 0; i--) {
-            unsigned long tmp = this->data[i] >> (sizeof(unsigned long) * 8 - n);
+            unsigned long tmp = this->data[i] >> (WORD_SIZE - n);
             this->data[i] <<= n;
             this->data[i + 1] |= tmp;
         }
     } else {
-        int to_ashes = n / (sizeof(unsigned long) * 8);
+        int to_ashes = n / WORD_SIZE;
         for (int i = this->capacity - to_ashes; i >= to_ashes; i--) {
             this->data[i] = this->data[i - to_ashes];
         }
         for (int i = 0; i < to_ashes; i++) {
             this->data[i] = 0;
         }
-        *this <<= n % (sizeof(unsigned long) * 8);
+        *this <<= n % WORD_SIZE;
     }
     this->clear_junk();
     return *this;
@@ -142,22 +142,22 @@ BitArray &BitArray::operator<<=(int n) {
 BitArray &BitArray::operator>>=(int n) {
     if (n <= 0) return *this;
     //i hate this too btw
-    if (n <= sizeof(unsigned long) * 8) {
+    if (n <= WORD_SIZE) {
         this->data[0] >>= n;
         for (int i = 1; i < this->capacity; i++) {
-            unsigned long tmp = this->data[i] << (sizeof(unsigned long) * 8 - n);
+            unsigned long tmp = this->data[i] << (WORD_SIZE - n);
             this->data[i] >>= n;
             this->data[i - 1] |= tmp;
         }
     } else {
-        int to_ashes = n / (sizeof(unsigned long) * 8);
+        int to_ashes = n / WORD_SIZE;
         for (int i = 0; i < this->capacity - to_ashes; i++) {
             this->data[i] = this->data[i + to_ashes];
         }
         for (int i = this->capacity - to_ashes; i < this->capacity; i++) {
             this->data[i] = 0;
         }
-        *this >>= n % (sizeof(unsigned long) * 8);
+        *this >>= n % WORD_SIZE;
     }
     this->clear_junk();
     return *this;
@@ -176,11 +176,11 @@ BitArray BitArray::operator>>(int n) const {
 }
 
 BitArray &BitArray::set(int n, bool value) {
-    int index = n / (sizeof(unsigned long) * 8);
+    int index = n / WORD_SIZE;
     if (value) {
-        this->data[index] |= (1UL << (n % (sizeof(unsigned long) * 8)));
+        this->data[index] |= (1UL << (n % WORD_SIZE));
     } else {
-        this->data[index] &= ~(1UL << (n % (sizeof(unsigned long) * 8)));
+        this->data[index] &= ~(1UL << (n % WORD_SIZE));
     }
     return *this;
 }
@@ -209,7 +209,7 @@ bool BitArray::any() const {
             if (i != this->capacity - 1) {
                 return true;
             }
-            for (int j = i * sizeof(unsigned long) * 8; j != num_bits; j++) {
+            for (int j = i * WORD_SIZE; j != num_bits; j++) {
                 if ((*this)[j]) {
                     return true;
                 }
@@ -225,7 +225,7 @@ bool BitArray::all() const {
             if (i != this->capacity - 1) {
                 return false;
             }
-            for (int j = i * sizeof(unsigned long) * 8; j != num_bits; j++) {
+            for (int j = i * WORD_SIZE; j != num_bits; j++) {
                 if (!(*this)[j]) {
                     return false;
                 }
@@ -256,7 +256,7 @@ int BitArray::count() const {
                 count++;
             }
         } else {
-            for (int j = i * sizeof(unsigned long) * 8; j < num_bits; j++) {
+            for (int j = i * WORD_SIZE; j < num_bits; j++) {
                 count += (*this)[j];
             }
         }
@@ -281,9 +281,9 @@ BitArray::ProxyBool BitArray::operator[](int i) {
 }
 
 bool BitArray::operator[](int i) const {
-    int index = i / (sizeof(unsigned long) * 8);
+    int index = i / WORD_SIZE;
     unsigned long tmp = this->data[index];
-    return (tmp >> (i % (sizeof(unsigned long) * 8))) & 1UL;
+    return (tmp >> (i % WORD_SIZE)) & 1UL;
 }
 
 int BitArray::size() const {
@@ -313,7 +313,7 @@ bool operator==(const BitArray &a, const BitArray &b) {
                 return false;
             }
         }
-        for (int j = i * sizeof(unsigned long) * 8; j < a.num_bits; j++) {
+        for (int j = i * a.WORD_SIZE; j < a.num_bits; j++) {
             if (a[j] != b[j]) return false;
         }
     }
@@ -343,7 +343,7 @@ BitArray operator^(const BitArray &b1, const BitArray &b2) {
 }
 
 void BitArray::clear_junk() {
-    for (int i = (this->capacity) * sizeof(unsigned long) * 8 - 1; i >= num_bits; i--) {
+    for (int i = (this->capacity) * WORD_SIZE - 1; i >= num_bits; i--) {
         this->set(i, false);
     }
 }

@@ -14,6 +14,8 @@ private:
     int num_bits;
     int capacity; //in bytes
 
+    static constexpr size_t WORD_SIZE = sizeof(unsigned long) * 8;
+
     //Proxy class for [] overloading
     class ProxyBool {
     private:
