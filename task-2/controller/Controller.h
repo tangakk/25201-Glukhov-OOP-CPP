@@ -13,6 +13,7 @@ class Controller {
 private:
     Universe *universe;
     View *view;
+    bool offline;
 public:
     Controller();
     void init(int argc, char *argv[]);

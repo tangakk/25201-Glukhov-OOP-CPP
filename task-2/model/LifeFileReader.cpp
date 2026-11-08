@@ -43,50 +43,52 @@ void LifeFileReader::read() {
                 f->close();
                 throw runtime_error("Invalid file format: " + line);
             }
+            continue;
         }
 
         if (line_number == 2) {
             if (line.substr(0, 3) != "#N ") {
                 this->result.warnings.push_back({actual_line_number, "Invalid name line: " + line});
-                actual_line_number--;
-                continue;
-            } else
+                line_number++;
+            } else {
                 this->result.name = line.substr(2);
+                continue;
+            }
         }
 
         if (line_number == 3) {
             if (line.substr(0, 3) != "#R ") {
                 this->result.warnings.push_back({actual_line_number, "Invalid rules line: " + line});
-                actual_line_number--;
-                continue;
-            }
-            int i = 3;
-            if (line[i] != 'B') {
-                f->close();
-                throw runtime_error("Invalid file format: " + line);
-            }
-            i++;
-            while (i < line.length() && line[i] != '/') {
-                if (isalnum(line[i])) {
-                    this->result.birth.push_back(line[i] - '0');
+                line_number++;
+            } else {
+                int i = 3;
+                if (line[i] != 'B') {
+                    f->close();
+                    throw runtime_error("Invalid file format: " + line);
                 }
                 i++;
-            }
-            if (line[i] != '/') {
-                f->close();
-                throw runtime_error("Invalid file format: " + line);
-            }
-            i++;
-            if (line[i] != 'S') {
-                f->close();
-                throw runtime_error("Invalid file format: " + line);
-            }
-            i++;
-            while (i < line.length()) {
-                if (isalnum(line[i])) {
-                    this->result.survival.push_back(line[i] - '0');
+                while (i < line.length() && line[i] != '/') {
+                    if (isalnum(line[i])) {
+                        this->result.birth.push_back(line[i] - '0');
+                    }
+                    i++;
+                }
+                if (line[i] != '/') {
+                    f->close();
+                    throw runtime_error("Invalid file format: " + line);
                 }
                 i++;
+                if (line[i] != 'S') {
+                    f->close();
+                    throw runtime_error("Invalid file format: " + line);
+                }
+                i++;
+                while (i < line.length()) {
+                    if (isalnum(line[i])) {
+                        this->result.survival.push_back(line[i] - '0');
+                    }
+                    i++;
+                }
             }
         }
 
@@ -123,11 +125,11 @@ void LifeFileReader::read() {
             return a.second < b.second;
         })->second;
 
-        int width = maxx - minx + 1;
-        int height = maxy - miny + 1;
+        int width = maxx - (minx<0?minx - 1:-1);
+        int height = maxy - (miny<0?miny - 1:-1);
         this->result.field = vector<vector<bool>>(height, vector<bool>(width, false));
         for (auto cell : cells) {
-            this->result.field[cell.second - miny][cell.first - minx] = true;
+            this->result.field[cell.second - (miny<0?miny:0)][cell.first - (minx<0?minx:0)] = true;
         }
     }
 }

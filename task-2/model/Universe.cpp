@@ -13,6 +13,7 @@ Universe::Universe() {
     this->birth = DEFAULT_BIRTH;
     this->survival = DEFAULT_SURVIVAL;
     this->field = vector<vector<bool> >(DEFAULT_HEIGHT, vector<bool>(DEFAULT_WIDTH, false));
+    this->current_tick = 0;
 
     // glider
     // _#_
@@ -41,6 +42,7 @@ Universe::Universe(const vector<vector<bool> > &field, const string &name) {
         }
     }
     this->name = name;
+    this->current_tick = 0;
 }
 
 Universe::Universe(const vector<int> &birth, vector<int> &survival, const string &name) {
@@ -48,8 +50,13 @@ Universe::Universe(const vector<int> &birth, vector<int> &survival, const string
     this->height = DEFAULT_HEIGHT;
     this->birth = birth;
     this->survival = survival;
+    if (birth.empty() && survival.empty()) {
+        this->birth = DEFAULT_BIRTH;
+        this->survival = DEFAULT_SURVIVAL;
+    }
     this->field = vector<vector<bool> >(DEFAULT_HEIGHT, vector<bool>(DEFAULT_WIDTH, false));
     this->name = name;
+    this->current_tick = 0;
 
     // anvil
     // _####__
@@ -78,16 +85,24 @@ Universe::Universe(const vector<vector<bool> > &field, const vector<int> &birth,
     this->height = height<DEFAULT_HEIGHT?DEFAULT_HEIGHT:height;
     this->birth = birth;
     this->survival = survival;
+    if (birth.empty() && survival.empty()) {
+        this->birth = DEFAULT_BIRTH;
+        this->survival = DEFAULT_SURVIVAL;
+    }
     this->field = field;
     if (this->field.size() < this->height) {
         this->field.resize(this->height);
-        if (this->field[0].size() < this->width) {
-            for (auto &row : this->field) {
-                row.resize(this->width, false);
-            }
+        for (auto &row : this->field) {
+            row.resize(this->width, false);
+        }
+    }
+    if (this->field[0].size() < this->width) {
+        for (auto &row : this->field) {
+            row.resize(this->width, false);
         }
     }
     this->name = name;
+    this->current_tick = 0;
 }
 
 void Universe::setCell(int x, int y, bool state) {
@@ -121,8 +136,8 @@ void Universe::tick() {
                     int neighborX = x + dx;
                     int neighborY = y + dy;
 
-                    int a = (neighborY+2*this->width)%this->width;
-                    int b = (neighborX+2*this->height)%this->height;
+                    int a = (neighborY+2*this->height)%this->height;
+                    int b = (neighborX+2*this->width)%this->width;
                     aliveNeighbors += field[a][b];
                 }
             }
@@ -135,6 +150,7 @@ void Universe::tick() {
         }
     }
     field = newField;
+    this->current_tick++;
 }
 
 void Universe::tick(int n) {
@@ -153,4 +169,8 @@ vector<int> Universe::getBirth() const {
 
 vector<int> Universe::getSurvival() const {
     return survival;
+}
+
+int Universe::getCurrentTick() const {
+    return current_tick;
 }

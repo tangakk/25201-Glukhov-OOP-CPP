@@ -18,7 +18,7 @@ private:
     int width, height;
     vector<vector<bool> > field;
     vector<int> birth, survival;
-
+    int current_tick;
 public:
     string name;
 
@@ -44,6 +44,7 @@ public:
     vector<int> getBirth() const;
 
     vector<int> getSurvival() const;
+    int getCurrentTick() const;
 };
 
 

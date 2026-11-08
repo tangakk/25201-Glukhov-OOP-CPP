@@ -9,7 +9,7 @@ private:
 public:
     explicit View(Universe *universe);
 
-    string getFieldAsString() const;
+    string getFieldAsString(const bool with_header=true) const;
 };
 
 
