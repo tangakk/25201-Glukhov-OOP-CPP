@@ -12,7 +12,6 @@
 class Controller {
 private:
     Universe *universe;
-    View *view;
     bool offline;
 public:
     Controller();

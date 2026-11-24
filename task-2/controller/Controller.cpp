@@ -4,21 +4,25 @@
 
 #include "Controller.h"
 #include <iostream>
+#include <memory>
+
 #include "../model/Universe.h"
 #include "../model/LifeFileReader.h"
 #include "../model/LifeFileWriter.h"
 #include "../view/View.h"
 #include "ArgvParser.h"
 #include <sstream>
+#include "Command.h"
 
 using std::cin;
 using std::cout;
 using std::istringstream;
 using std::endl;
+using std::unique_ptr;
+using std::make_unique;
 
 Controller::Controller() {
     this->universe = NULL;
-    this->view = NULL;
     this->offline = false;
 }
 
@@ -82,9 +86,7 @@ void Controller::init(int argc, char *argv[]) {
         return;
     }
 
-
-    this->view = new View(this->universe);
-    cout << this->view->getFieldAsString() << endl;
+    cout << this->universe->getFieldAsString() << endl;
 }
 
 void Controller::run() {
@@ -92,48 +94,28 @@ void Controller::run() {
     string input;
     while (
         getline(cin, input)) {
-        bool stop = false;
         istringstream ss(input);
         string command;
-        while (ss >> command) {
-            if (command == "dump") {
-                string filename;
-                if (!(ss >> filename)) {
-                    cout << "Error: No filename provided for dump command." << std::endl;
-                    continue;
-                }
-                LifeFileWriter writer(filename, *this->universe);
-                try {
-                    writer.write();
-                    cout << "Universe dumped to " << filename << std::endl;
-                } catch (const std::exception &e) {
-                    cout << "Error writing to file: " << e.what() << std::endl;
-                }
-            } else if (command == "tick") {
-                int n = 1;
-                if (ss >> n) {
-                    this->universe->tick(n);
-                } else {
-                    this->universe->tick();
-                }
-                cout << view->getFieldAsString() << endl;
-            } else if (command == "exit") {
-                stop = true;
-                break;
-            } else if (command == "help") {
-                cout << "Available commands:" << endl;
-                cout << "  tick [n] - Advance the universe by n ticks (default is 1)" << endl;
-                cout << "  dump <filename> - Dump the current state of the universe to a file" << endl;
-                cout << "  exit - Exit the program" << endl;
-                cout << "  help - Show this help message" << endl;
-            }
-            else {
-                cout << "Unknown command: " << command << endl;
-                cout << "Type 'help' for a list of commands." << endl;
-            }
+        std::unique_ptr<Command> c;
+        ss >> command;
+
+        if (command == "dump") {
+            string param;
+            ss >> param;
+            c = make_unique<Dump>(this->universe, param);
+        } else if (command == "tick") {
+            int n = 1;
+            ss >> n;
+            c = make_unique<Tick>(this->universe, n);
+        } else if (command == "exit") {
+            c = make_unique<Exit>();
+        } else if (command == "help") {
+            c = make_unique<Help>();
+        } else {
+            c = make_unique<Help>();
         }
-        if (stop) {
-            break;
-        }
+
+        CommandResult res = c->exec();
+        cout << res.message << endl;
     }
 }

@@ -45,6 +45,8 @@ public:
 
     vector<int> getSurvival() const;
     int getCurrentTick() const;
+
+    string getFieldAsString(bool with_header = true) const;
 };
 
 

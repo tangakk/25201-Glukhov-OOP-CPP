@@ -12,6 +12,7 @@ Universe::Universe() {
     this->height = DEFAULT_HEIGHT;
     this->birth = DEFAULT_BIRTH;
     this->survival = DEFAULT_SURVIVAL;
+    this->name = DEFAULT_NAME;
     this->field = vector<vector<bool> >(DEFAULT_HEIGHT, vector<bool>(DEFAULT_WIDTH, false));
     this->current_tick = 0;
 
@@ -174,3 +175,28 @@ vector<int> Universe::getSurvival() const {
 int Universe::getCurrentTick() const {
     return current_tick;
 }
+
+string Universe::getFieldAsString(bool with_header) const {
+        string result;
+        if (with_header) {
+            result += "Universe: " + this->name + "\n";
+            result += "Ruleset: B";
+            for (int b : this->birth) {
+                result += std::to_string(b);
+            }
+            result += "/S";
+            for (int s : this->survival) {
+                result += std::to_string(s);
+            }
+            result += "\n";
+            result += "Current tick: " + std::to_string(this->current_tick) + "\n";
+        }
+        for (const auto &row : this->field) {
+            for (bool cell : row) {
+                result += cell ? '#' : ' ';
+            }
+            result += '\n';
+        }
+        return result;
+    }
+
