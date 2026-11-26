@@ -13,17 +13,15 @@ using std::set;
 using std::pair;
 using std::min_element;
 using std::max_element;
+using std::make_unique;
 
 LifeFileReader::LifeFileReader(const string &filename) {
-    this->filename = filename;
-    this->f = new ifstream(filename);
+    this->reader = make_unique<FileReader>(filename);
+    this->reader->open();
     this->result = LifeFileResult();
 }
 
 void LifeFileReader::read() {
-    if (!f->is_open()) {
-        throw runtime_error("Could not open file: " + filename);
-    }
 
     string line;
     int line_number = 0;
@@ -31,7 +29,9 @@ void LifeFileReader::read() {
 
     set<pair<int, int> > cells;
 
-    while (getline(*f, line)) {
+    while (this->reader->hasNext()) {
+        line = this->reader->next();
+
         if (line.empty()) {
             continue;
         }
@@ -40,7 +40,7 @@ void LifeFileReader::read() {
 
         if (line_number == 1) {
             if (line != "#Life 1.06") {
-                f->close();
+                this->reader->close();
                 throw runtime_error("Invalid file format: " + line);
             }
             continue;
@@ -63,7 +63,7 @@ void LifeFileReader::read() {
             } else {
                 int i = 3;
                 if (line[i] != 'B') {
-                    f->close();
+                    this->reader->close();
                     throw runtime_error("Invalid file format: " + line);
                 }
                 i++;
@@ -74,12 +74,12 @@ void LifeFileReader::read() {
                     i++;
                 }
                 if (line[i] != '/') {
-                    f->close();
+                    this->reader->close();
                     throw runtime_error("Invalid file format: " + line);
                 }
                 i++;
                 if (line[i] != 'S') {
-                    f->close();
+                    this->reader->close();
                     throw runtime_error("Invalid file format: " + line);
                 }
                 i++;
@@ -109,7 +109,7 @@ void LifeFileReader::read() {
         }
     }
 
-    f->close();
+    this->reader->close();
 
     if (!cells.empty()) {
         int minx = min_element(cells.begin(), cells.end(), [](const pair<int, int> &a, const pair<int, int> &b) {

@@ -10,4 +10,6 @@ add_executable(
         controller/Controller.cpp
         controller/ArgvParser.cpp
         controller/Command.cpp
+        controller/CommandParser.cpp
+        ../task-0/FileReader.cpp
         main.cpp)

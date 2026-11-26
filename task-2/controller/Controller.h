@@ -7,12 +7,13 @@
 
 #include "../model/Universe.h"
 #include "../model/LifeFileReader.h"
-#include "../view/View.h"
 
 class Controller {
 private:
     Universe *universe;
     bool offline;
+    int t;
+    string res;
 public:
     Controller();
     void init(int argc, char *argv[]);

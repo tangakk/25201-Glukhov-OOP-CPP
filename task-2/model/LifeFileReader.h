@@ -2,12 +2,15 @@
 #define CPP_LIFEFILEREADER_H
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
+#include "../../task-0/FileReader.h"
 
 using std::ifstream;
 using std::string;
 using std::vector;
+using std::unique_ptr;
 
 struct Warning {
     int line;
@@ -23,8 +26,7 @@ struct LifeFileResult {
 
 class LifeFileReader {
     private:
-        string filename;
-        ifstream *f;
+        unique_ptr<FileReader> reader;
     public:
         LifeFileResult result;
         LifeFileReader(const string &filename);

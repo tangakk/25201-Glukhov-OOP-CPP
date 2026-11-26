@@ -9,10 +9,10 @@
 #include "../model/Universe.h"
 #include "../model/LifeFileReader.h"
 #include "../model/LifeFileWriter.h"
-#include "../view/View.h"
 #include "ArgvParser.h"
 #include <sstream>
 #include "Command.h"
+#include "CommandParser.h"
 
 using std::cin;
 using std::cout;
@@ -27,27 +27,18 @@ Controller::Controller() {
 }
 
 void Controller::init(int argc, char *argv[]) {
+    string in;
     if (argc == 1) {
         this->universe = new Universe();
+        cout << this->universe->getFieldAsString() << endl;
+        return;
     } else if (argc == 2) {
-        string filename = argv[1];
-        LifeFileReader reader(filename);
-        reader.read();
-        LifeFileResult result = reader.result;
-        if (!result.warnings.empty()) {
-            std::cerr << "Warnings while reading file:" << std::endl;
-            for (const auto &warning: result.warnings) {
-                std::cerr << "Line " << warning.line << ": " << warning.message << std::endl;
-            }
-        }
-        this->universe = new Universe(result.field, result.birth, result.survival, result.field[0].size(),
-                                      result.field.size(), result.name);
+        in = argv[1];
     } else {
         ArgvParser p(argc, argv);
         map<string, string> args = p.res;
         int tick = -1;
         string out;
-        string in;
         for (const auto &[key, value]: args) {
             if (key == "-i" || key == "--iterations") {
                 tick = stoi(value);
@@ -69,52 +60,38 @@ void Controller::init(int argc, char *argv[]) {
         }
 
         this->offline = true;
-
-        LifeFileReader r(in);
-        r.read();
-        LifeFileResult result = r.result;
-        this->universe = new Universe(result.field, result.birth, result.survival, result.field[0].size(),
-                                      result.field.size(), result.name);
-        this->universe->tick(tick);
-        LifeFileWriter writer(out, *this->universe);
-        try {
-            writer.write();
-            cout << "Universe dumped to " << out << std::endl;
-        } catch (const std::exception &e) {
-            cout << "Error writing to file: " << e.what() << std::endl;
-        }
-        return;
+        this->t = tick;
+        this->res = out;
     }
 
-    cout << this->universe->getFieldAsString() << endl;
+    LifeFileReader r(in);
+    r.read();
+    LifeFileResult result = r.result;
+    this->universe = new Universe(result.field, result.birth, result.survival, result.field[0].size(),
+                                  result.field.size(), result.name);
+    if (!result.warnings.empty()) {
+        std::cerr << "Warnings while reading file:" << std::endl;
+        for (const auto &warning: result.warnings) {
+            std::cerr << "Line " << warning.line << ": " << warning.message << std::endl;
+        }
+    }
+
+    if (!this->offline) {
+        cout << this->universe->getFieldAsString() << endl;
+    }
 }
 
 void Controller::run() {
-    if (offline) return;
+    if (this->offline) {
+        make_unique<Tick>(this->universe, this->t)->exec();
+        make_unique<Dump>(this->universe, this->res)->exec();
+        make_unique<Exit>()->exec();
+    }
     string input;
+    CommandParser parser(this->universe);
     while (
         getline(cin, input)) {
-        istringstream ss(input);
-        string command;
-        std::unique_ptr<Command> c;
-        ss >> command;
-
-        if (command == "dump") {
-            string param;
-            ss >> param;
-            c = make_unique<Dump>(this->universe, param);
-        } else if (command == "tick") {
-            int n = 1;
-            ss >> n;
-            c = make_unique<Tick>(this->universe, n);
-        } else if (command == "exit") {
-            c = make_unique<Exit>();
-        } else if (command == "help") {
-            c = make_unique<Help>();
-        } else {
-            c = make_unique<Help>();
-        }
-
+        unique_ptr<Command> c = parser.parse(input);
         CommandResult res = c->exec();
         cout << res.message << endl;
     }
