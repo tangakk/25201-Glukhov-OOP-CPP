@@ -36,3 +36,16 @@ target_link_libraries(
         gtest
         gtest_main
 )
+
+add_executable(
+        task-2_tests_run
+        task-2/UniverseTests.cpp
+        ../task-2/model/Universe.cpp
+        ../task-2/model/Universe.h
+)
+
+target_link_libraries(
+        task-2_tests_run
+        gtest
+        gtest_main
+)
